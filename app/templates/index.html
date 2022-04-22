@@ -1,0 +1,26 @@
+<html>
+
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/app/templates/cs.css">
+</head>
+
+<body>
+    <header>
+        <h1>북북이</h1>
+
+        <center>
+            <form id="search-form" action="/search">
+                <input type="search" placeholder="keyword" id="search_input" name="q" />
+                <button type="submit">검색</button>
+
+            </form>
+        </center>
+    </header>
+
+    <main>
+        {{keyword}}
+    </main>
+</body>
+
+</html>
