@@ -12,15 +12,15 @@ class NaverBookScraper:
     @staticmethod
     async def fetch(session, url, headers):
         async with session.get(url, headers=headers) as response:
-            if response.status_code == 200:
+            if response.status == 200:
                 result = await response.json()
-                return result
+                return result["items"]
 
     def unit_url(self, keyword, start):
         return {
-            "url": f"{self.NAVER_API_BOOK}?query={keyword}&display=10&star={start}",
+            "url": f"{self.NAVER_API_BOOK}?query={keyword}&display=10&start={start}",
             "headers": {
-                "X-Naver-Client_Id": self.NAVER_API_ID,
+                "X-Naver-Client-Id": self.NAVER_API_ID,
                 "X-Naver-Client-Secret": self.NAVER_API_SECRET,
             },
         }
@@ -31,3 +31,20 @@ class NaverBookScraper:
             all_data = await asyncio.gather(
                 *[NaverBookScraper.fetch(session, api["url"], api["headers"]) for api in apis]
             )
+
+            result = []
+            for data in all_data:
+                if data is not None:
+                    for book in data:
+                        result.append(book)
+            return result
+
+    def run(self, keyword, total_page):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        return asyncio.run(self.search(keyword, total_page))
+
+
+if __name__ == "__main__":
+    scraper = NaverBookScraper()
+    print(scraper.run("파이썬", 3))
+    print(len(scraper.run("파이썬", 5)))
