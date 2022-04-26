@@ -34,7 +34,20 @@ async def search(request: Request, q: str):
     keyword = q
     # (예외처리)
     #   ㄴ 검색어가 없다면 사용자에게 검색을 요구 return
+    if not keyword:
+        return templates.TemplateResponse(
+            "./index.html",
+            {"request": request, "title": "북북이"},
+        )
+    if await mongodb.engine.find_one(BookModel, BookModel.keyword == keyword):
+        books = await mongodb.engine.find(BookModel, BookModel.keyword == keyword)
+        return templates.TemplateResponse(
+            "./index.html",
+            {"request": request, "title": "북북이", "books": books},
+        )
+
     #   ㄴ 해당 검색어에 대해 수집된 데이터가 이미 DB에 존재한다면 해당 데이터를 사용자에게 보여준다. return
+
     # 2. 데이터 수집기로 해당 검색어에 대해 데이터를 수집한다.
     naver_book_scraper = NaverBookScraper()
     books = await naver_book_scraper.search(keyword, 10)
